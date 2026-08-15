@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-inter);
+  --color-background: #09090b;
+  --color-foreground: #fafafa;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #18181b;
+}
+::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
+}
+
+/* Animated gradient for the hero */
+@keyframes gradient-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 6s ease infinite;
+}

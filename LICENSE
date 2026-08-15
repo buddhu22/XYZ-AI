@@ -1,6 +1,10 @@
 MIT License
 
+<<<<<<< HEAD
 Copyright (c) 2026 Abhay Mishra
+=======
+Copyright (c) 2026 XYZ AI
+>>>>>>> 1c410e6 (feat: initial Phase 1 foundation & architecture for XYZ AI)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

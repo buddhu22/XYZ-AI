@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  # --- PostgreSQL ---
+  postgres:
+    image: postgres:16-alpine
+    container_name: xyz-ai-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: xyz_ai
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # --- Backend ---
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: xyz-ai-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/xyz_ai
+      - SECRET_KEY=dev-secret-key
+      - BACKEND_CORS_ORIGINS=["http://localhost:3000"]
+    depends_on:
+      - postgres
+    volumes:
+      - ./backend:/app
+
+volumes:
+  postgres_data:

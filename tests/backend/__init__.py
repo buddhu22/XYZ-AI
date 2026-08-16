@@ -1,1 +1,1 @@
-"""XYZ AI Backend — Tests package."""
+# tests/backend package

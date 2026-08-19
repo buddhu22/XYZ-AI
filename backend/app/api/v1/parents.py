@@ -32,3 +32,34 @@ def get_parent_by_id(parent_id: int, db: Session = Depends(get_db)):
             for s in p.students
         ]
     )
+
+
+@router.get("/user/{user_id}", response_model=ParentDetailResponse, summary="Get parent profile by User ID")
+def get_parent_by_user_id(user_id: int, db: Session = Depends(get_db)):
+    """Retrieve parent profile by user ID."""
+    from app.models.user import User
+    from fastapi import HTTPException
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user or not user.parent:
+        raise HTTPException(status_code=404, detail="Parent profile not found for this user")
+    p = user.parent
+    return ParentDetailResponse(
+        id=p.id,
+        user_id=p.user_id,
+        name=p.user.name,
+        email=p.user.email,
+        phone=p.phone,
+        children=[
+            StudentDetailResponse(
+                id=s.id,
+                roll_number=s.roll_number,
+                class_name=s.class_name,
+                section=s.section,
+                user_id=s.user_id,
+                name=s.user.name,
+                email=s.user.email
+            )
+            for s in p.students
+        ]
+    )
+

@@ -10,6 +10,7 @@ interface RoleCardProps {
   title: string;
   description: string;
   gradient: string;
+  onClick: () => void;
 }
 
 export default function RoleCard({
@@ -17,9 +18,13 @@ export default function RoleCard({
   title,
   description,
   gradient,
+  onClick,
 }: RoleCardProps) {
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur-sm transition-all duration-300 hover:border-zinc-600 hover:bg-zinc-900/80 hover:shadow-lg hover:shadow-zinc-900/50 hover:-translate-y-1">
+    <div
+      onClick={onClick}
+      className="group relative cursor-pointer overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 backdrop-blur-sm transition-all duration-300 hover:border-indigo-500/50 hover:bg-zinc-900/80 hover:shadow-lg hover:shadow-indigo-500/5 hover:-translate-y-1"
+    >
       {/* Gradient accent */}
       <div
         className={`absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-10 ${gradient}`}
@@ -30,8 +35,8 @@ export default function RoleCard({
         <div className="mb-4 text-4xl">{icon}</div>
         <h3 className="mb-2 text-lg font-semibold text-zinc-100">{title}</h3>
         <p className="text-sm leading-relaxed text-zinc-400">{description}</p>
-        <div className="mt-4 flex items-center gap-1 text-xs font-medium text-zinc-500 transition-colors group-hover:text-zinc-300">
-          <span>Coming Soon</span>
+        <div className="mt-4 flex items-center gap-1 text-xs font-semibold text-zinc-400 transition-colors group-hover:text-indigo-400">
+          <span>Launch AI Assistant</span>
           <svg
             className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5"
             fill="none"
@@ -50,3 +55,4 @@ export default function RoleCard({
     </div>
   );
 }
+

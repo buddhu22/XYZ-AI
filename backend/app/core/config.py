@@ -6,10 +6,10 @@ All secrets are read from environment / .env file — never hardcoded.
 """
 
 from functools import lru_cache
-from typing import List
+from typing import List, Union
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import model_validator
+from pydantic import model_validator, field_validator
 
 
 class Settings(BaseSettings):
@@ -41,10 +41,40 @@ class Settings(BaseSettings):
     ERP_BASE_URL: str = "http://127.0.0.1:8000"
 
     # --- CORS ---
-    BACKEND_CORS_ORIGINS: List[str] = ["http://localhost:3000"]
+    BACKEND_CORS_ORIGINS: Union[List[str], str] = ["http://localhost:3000"]
 
     # --- Deployment ---
-    ALLOWED_HOSTS: List[str] = ["*"]
+    ALLOWED_HOSTS: Union[List[str], str] = ["*"]
+
+    @field_validator("BACKEND_CORS_ORIGINS", mode="before")
+    @classmethod
+    def _assemble_cors_origins(cls, v: Union[str, List[str]]) -> List[str]:
+        if isinstance(v, str):
+            if v.startswith("[") and v.endswith("]"):
+                import json
+                try:
+                    return json.loads(v)
+                except Exception:
+                    pass
+            return [i.strip() for i in v.split(",") if i.strip()]
+        elif isinstance(v, (list, tuple)):
+            return list(v)
+        return ["http://localhost:3000"]
+
+    @field_validator("ALLOWED_HOSTS", mode="before")
+    @classmethod
+    def _assemble_allowed_hosts(cls, v: Union[str, List[str]]) -> List[str]:
+        if isinstance(v, str):
+            if v.startswith("[") and v.endswith("]"):
+                import json
+                try:
+                    return json.loads(v)
+                except Exception:
+                    pass
+            return [i.strip() for i in v.split(",") if i.strip()]
+        elif isinstance(v, (list, tuple)):
+            return list(v)
+        return ["*"]
 
     @model_validator(mode="after")
     def _warn_insecure_defaults(self) -> "Settings":

@@ -225,7 +225,7 @@ async def chat_voice(
         response_text = await run_chat_pipeline(
             message=transcription,
             role=norm_role,
-            user_id=user_id,
+            user_id=effective_user_id,
             language=language,
         )
         

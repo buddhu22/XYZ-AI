@@ -1,5 +1,8 @@
 "use client";
 
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
 export interface ChildInfo {
   id: number;
   name: string;
@@ -66,7 +69,7 @@ export async function loginUser(
   password: string,
   role?: string
 ): Promise<{ token: string; user: UserInfo }> {
-  const response = await fetch("http://127.0.0.1:8000/api/v1/auth/login", {
+  const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password, role: role?.toLowerCase() }),
@@ -86,7 +89,7 @@ export async function loginUser(
 }
 
 export async function fetchCurrentUser(token: string): Promise<UserInfo> {
-  const response = await fetch("http://127.0.0.1:8000/api/v1/auth/me", {
+  const response = await fetch(`${API_BASE_URL}/api/v1/auth/me`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 

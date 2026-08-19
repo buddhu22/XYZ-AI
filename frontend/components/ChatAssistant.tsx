@@ -4,6 +4,9 @@ import React, { useState, useRef, useEffect } from "react";
 import AIAvatar, { AvatarState } from "./AIAvatar";
 import { getStoredAuth } from "@/lib/auth";
 
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
 // 11 Supported languages for Multilingual support
 export const SUPPORTED_LANGUAGES = [
   { code: "en", name: "English" },
@@ -52,9 +55,9 @@ export default function ChatAssistant({ role, token: propToken, userName, onClos
 
   // Set default initial greeting
   useEffect(() => {
-    const greeting = getGreeting(role);
+    const greeting = getGreeting(role, userName);
     setMessages([{ sender: "ai", text: greeting, type: "text" }]);
-  }, [role]);
+  }, [role, userName]);
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -68,14 +71,18 @@ export default function ChatAssistant({ role, token: propToken, userName, onClos
     };
   }, []);
 
-  const getGreeting = (roleName: string) => {
+  const getGreeting = (roleName: string, name?: string) => {
     switch (roleName.toLowerCase()) {
       case "student":
-        return "Hello Aarav! Ask me anything about your attendance or schedules.";
+        return name
+          ? `Hello ${name}! Ask me anything about your attendance or schedules.`
+          : "Hello! Ask me anything about your attendance or schedules.";
       case "parent":
         return "Welcome back! You can check your child's attendance here.";
       case "teacher":
-        return "Hello Teacher. You can mark attendance or fetch student summaries.";
+        return name
+          ? `Hello ${name}. You can mark attendance or fetch student summaries.`
+          : "Hello Teacher. You can mark attendance or fetch student summaries.";
       case "principal":
         return "Good day Principal. Ask me for school-wide attendance metrics.";
       default:
@@ -152,23 +159,23 @@ export default function ChatAssistant({ role, token: propToken, userName, onClos
       formData.append("audio", audioBlob, "recording.webm");
       formData.append("role", role.toLowerCase());
       formData.append("language", language);
-      
-      // Sourced from dynamic trusted contexts:
-      // Parent: Rajesh Sharma (user_id=5, parent_id=1)
-      // Student: Aarav Sharma (user_id=10, student_id=1)
-      // Teacher: Amit Kumar (user_id=2, teacher_id=1)
-      const user_id_map: Record<string, number> = { student: 10, parent: 5, teacher: 2, principal: 1 };
-      const userId = user_id_map[role.toLowerCase()] || 101;
-      formData.append("user_id", String(userId));
 
       const auth = getStoredAuth();
       const authToken = propToken || auth.token;
+
+      // NOTE: user_id here is only a fallback for unauthenticated/dev testing.
+      // The backend must never trust this value for authorization — it decodes
+      // the real identity from the Authorization Bearer token when present.
+      if (auth.user?.id) {
+        formData.append("user_id", String(auth.user.id));
+      }
+
       const headers: Record<string, string> = {};
       if (authToken) {
         headers["Authorization"] = `Bearer ${authToken}`;
       }
 
-      const response = await fetch("http://127.0.0.1:8000/api/v1/chat/voice", {
+      const response = await fetch(`${API_BASE_URL}/api/v1/chat/voice`, {
         method: "POST",
         headers: headers,
         body: formData,
@@ -225,6 +232,9 @@ export default function ChatAssistant({ role, token: propToken, userName, onClos
     try {
       const auth = getStoredAuth();
       const authToken = propToken || auth.token;
+      // NOTE: fallback only for unauthenticated/dev testing — the backend
+      // must never trust this value; it decodes the real identity from the
+      // Authorization Bearer token when present.
       const userId = auth.user?.id || 10;
 
       const headers: Record<string, string> = { "Content-Type": "application/json" };
@@ -232,7 +242,7 @@ export default function ChatAssistant({ role, token: propToken, userName, onClos
         headers["Authorization"] = `Bearer ${authToken}`;
       }
 
-      const response = await fetch("http://127.0.0.1:8000/api/v1/chat", {
+      const response = await fetch(`${API_BASE_URL}/api/v1/chat`, {
         method: "POST",
         headers: headers,
         body: JSON.stringify({

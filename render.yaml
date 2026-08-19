@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: xyz-ai-backend
+    runtime: python
+    region: oregon
+    plan: free
+    rootDir: backend
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: APP_NAME
+        value: XYZ AI
+      - key: APP_VERSION
+        value: 1.0.0
+      - key: DEBUG
+        value: false
+      - key: LOG_LEVEL
+        value: INFO
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.5-flash-lite
+      - key: ERP_BASE_URL
+        value: http://127.0.0.1:8000
+      - key: BACKEND_CORS_ORIGINS
+        value: '["http://localhost:3000","https://*.vercel.app"]'
+      - key: ALLOWED_HOSTS
+        value: '["*"]'

@@ -27,7 +27,7 @@ else:
     engine = create_engine(
         database_url,
         pool_pre_ping=True,
-        connect_args={"connect_timeout": 2},
+        connect_args={"connect_timeout": 10},
         echo=settings.DEBUG,
     )
 
